@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gửi Em Gái Đinh Thu Trang - 20/10 Hạnh Phúc!</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Dancing Script & Be Vietnam Pro -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti cho hiệu ứng pháo hoa hoa lá -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Tone.js cho âm thanh nhạc nền dễ thương -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 50%, #f472b6 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .font-handwriting {
+            font-family: 'Dancing Script', cursive;
+        }
+        /* Floating background hearts and stars */
+        @keyframes floatUp {
+            0% {
+                transform: translateY(105vh) scale(0.6) rotate(0deg);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.8;
+            }
+            80% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        .floating-element {
+            position: absolute;
+            bottom: -50px;
+            pointer-events: none;
+            animation: floatUp 8s linear infinite;
+        }
+        /* Envelope hover & open effects */
+        .envelope-container {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .envelope-container:hover {
+            transform: translateY(-8px) scale(1.02);
+            filter: drop-shadow(0 20px 25px rgba(225, 29, 72, 0.25));
+        }
+        /* Letter paper animation */
+        @keyframes slideUpPaper {
+            0% {
+                transform: translateY(40px) scale(0.9);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+        .paper-reveal {
+            animation: slideUpPaper 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        /* Pulse glow for buttons */
+        @keyframes softPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(244, 63, 94, 0); }
+        }
+        .pulse-btn {
+            animation: softPulse 2.5s infinite;
+        }
+    </style>
+</head>
+<body class="relative flex flex-col items-center justify-center p-4 selection:bg-rose-200 selection:text-rose-800">
+
+    <!-- Background Floating Elements Container -->
+    <div id="bg-effects" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+    <!-- Top Sound Toggle Button -->
+    <div class="absolute top-4 right-4 z-50 flex items-center gap-2">
+        <button id="sound-toggle" onclick="toggleMusic()" class="bg-white/80 hover:bg-white text-rose-600 px-4 py-2 rounded-full shadow-lg backdrop-blur-md transition-all flex items-center gap-2 font-medium border border-rose-200">
+            <i id="sound-icon" class="fa-solid fa-volume-xmark"></i>
+            <span id="sound-text" class="text-sm">Bật Nhạc Nền</span>
+        </button>
+    </div>
+
+    <!-- Main Wrapper -->
+    <main class="relative z-10 w-full max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[90vh]">
+
+        <!-- Header Title before opening -->
+        <div id="intro-title" class="text-center mb-6 transition-all duration-500">
+            <span class="inline-block bg-white/70 backdrop-blur-md text-rose-600 px-4 py-1.5 rounded-full text-sm font-semibold tracking-wider uppercase mb-3 shadow-sm border border-rose-200">
+                <i class="fa-solid fa-gift mr-1.5"></i> Món Quà Đặc Biệt 20/10
+            </span>
+            <h1 class="text-3xl md:text-5xl font-bold text-rose-800 font-handwriting drop-shadow-sm">
+                Gửi Em Gái Đinh Thu Trang
+            </h1>
+            <p class="text-rose-700/80 mt-2 text-sm md:text-base font-medium">
+                Một chiếc thư bí mật đang chờ em mở ra nè! 👇
+            </p>
+        </div>
+
+        <!-- ENVELOPE SECTION (Initial State) -->
+        <div id="envelope-box" class="envelope-container relative w-72 sm:w-96 h-52 sm:h-64 bg-rose-100 rounded-2xl shadow-2xl border-4 border-white flex flex-col items-center justify-center group overflow-hidden" onclick="openLetter()">
+            <!-- Envelope Back Flap Design -->
+            <div class="absolute inset-0 bg-gradient-to-b from-rose-200 to-rose-300 rounded-xl"></div>
+            
+            <!-- Envelope Flap Top -->
+            <div class="absolute top-0 left-0 w-full h-32 bg-rose-300 origin-top rounded-b-3xl shadow-inner transition-transform duration-500 group-hover:rotate-x-180" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
+
+            <!-- Heart Seal Badge -->
+            <div class="absolute z-20 w-16 h-16 bg-rose-600 rounded-full flex items-center justify-center text-white shadow-lg pulse-btn border-2 border-white">
+                <i class="fa-solid fa-heart text-2xl animate-pulse"></i>
+            </div>
+
+            <!-- Hint text on envelope -->
+            <div class="absolute bottom-6 z-20 bg-white/90 backdrop-blur-sm px-4 py-1.5 rounded-full text-rose-600 text-xs sm:text-sm font-bold shadow-md border border-rose-200">
+                <i class="fa-solid fa-hand-pointer mr-1 animate-bounce"></i> Nhấp để mở thư nhé!
+            </div>
+        </div>
+
+        <!-- LETTER PAPER SECTION (Hidden initially) -->
+        <div id="letter-box" class="hidden w-full bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border-2 border-rose-200 p-6 sm:p-10 relative overflow-hidden paper-reveal mt-2">
+            <!-- Decorative Rose Illustration in top corner -->
+            <div class="absolute top-4 right-4 text-rose-500 text-4xl sm:text-5xl animate-bounce">
+                🌹
+            </div>
+            <div class="absolute bottom-4 left-4 text-rose-400 text-2xl sm:text-3xl opacity-50">
+                ✨💖✨
+            </div>
+
+            <!-- Letter Content Header -->
+            <div class="text-center border-b border-rose-100 pb-4 mb-6">
+                <span class="text-xs uppercase tracking-widest text-rose-400 font-bold">Ngày Phụ Nữ Việt Nam</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-rose-800 font-handwriting mt-1">
+                    Gửi Em Gái Đinh Thu Trang Thân Yêu!
+                </h2>
+                <div class="flex justify-center items-center gap-2 text-rose-500 mt-2 text-sm">
+                    <i class="fa-solid fa-star"></i>
+                    <span>20 tháng 10 yêu thương</span>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+            </div>
+
+            <!-- Letter Body Content -->
+            <div class="text-gray-700 space-y-4 text-base sm:text-lg leading-relaxed font-normal">
+                <p>
+                    Hôm nay là ngày 20/10 - Ngày Phụ nữ Việt Nam, ngày tôn vinh một nửa thế giới xinh đẹp và tuyệt vời. 
+                </p>
+                <p>
+                    Anh chúc em gái <strong class="text-rose-600 font-semibold">Đinh Thu Trang</strong> những lời chúc tốt đẹp nhất từ tận đáy lòng. Chúc em luôn xinh tươi như những đóa hoa hồng nở rộ, luôn tràn đầy năng lượng tích cực, nụ cười luôn nở trên môi và gặp thật nhiều may mắn trong cuộc sống.
+                </p>
+                <p>
+                    Cảm ơn em vì đã là một người em gái dễ thương. Mong rằng mọi dự định, ước mơ của em trong học tập và công việc đều sẽ trở thành hiện thực. Hãy luôn tự tin và tỏa sáng theo cách riêng của mình nhé!
+                </p>
+            </div>
+
+            <!-- Signature -->
+            <div class="mt-8 pt-4 border-t border-rose-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <!-- Interactive Love Button -->
+                    <button onclick="sendLove()" class="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2.5 rounded-full font-semibold text-sm shadow-md transition-all flex items-center gap-2 active:scale-95">
+                        <i class="fa-solid fa-heart text-white"></i> Thả Tim Yêu Thương (<span id="love-count">0</span>)
+                    </button>
+                    <!-- Close / Reset Button -->
+                    <button onclick="closeLetter()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2.5 rounded-full font-medium text-sm transition-all">
+                        Đóng Thư
+                    </button>
+                </div>
+                
+                <div class="text-right">
+                    <p class="text-xs text-rose-400 font-medium">Gửi từ trái tim ❤️</p>
+                    <p class="text-lg font-handwriting font-bold text-rose-700">Dành tặng Đinh Thu Trang</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer Note -->
+    <footer class="mt-6 text-center text-rose-800/70 text-xs z-10 font-medium">
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- 1. Background Floating Elements Generator ---
+        const icons = ['❤️', '💖', '🌸', '✨', '🌹', '⭐', '🌷'];
+        const bgContainer = document.getElementById('bg-effects');
+
+        function createFloatingElement() {
+            const el = document.createElement('div');
+            el.className = 'floating-element';
+            el.innerText = icons[Math.floor(Math.random() * icons.length)];
+            el.style.left = Math.random() * 100 + 'vw';
+            el.style.fontSize = (Math.random() * 16 + 14) + 'px';
+            
+            const duration = Math.random() * 5 + 6; // 6s to 11s
+            el.style.animationDuration = duration + 's';
+            
+            bgContainer.appendChild(el);
+
+            setTimeout(() => {
+                el.remove();
+            }, duration * 1000);
+        }
+
+        // Generate initial floating items & interval
+        for(let i = 0; i < 15; i++) {
+            setTimeout(createFloatingElement, Math.random() * 5000);
+        }
+        setInterval(createFloatingElement, 600);
+
+        // --- 2. Letter Open Interaction & Confetti Fireworks ---
+        let isOpened = false;
+
+        function openLetter() {
+            if (isOpened) return;
+            isOpened = true;
+
+            // Hide intro title and envelope box smoothly
+            document.getElementById('intro-title').style.opacity = '0';
+            document.getElementById('intro-title').style.transform = 'translateY(-20px)';
+            setTimeout(() => {
+                document.getElementById('intro-title').classList.add('hidden');
+            }, 300);
+
+            const envelope = document.getElementById('envelope-box');
+            envelope.style.transform = 'scale(0.8) translateY(50px)';
+            envelope.style.opacity = '0';
+            setTimeout(() => {
+                envelope.classList.add('hidden');
+                // Show letter box
+                const letterBox = document.getElementById('letter-box');
+                letterBox.classList.remove('hidden');
+            }, 400);
+
+            // Trigger magnificent fireworks & flower burst
+            triggerBurstFireworks();
+
+            // Try playing pleasant background music if permitted
+            startAudioOnAction();
+        }
+
+        function closeLetter() {
+            isOpened = false;
+            const letterBox = document.getElementById('letter-box');
+            letterBox.classList.add('hidden');
+
+            const introTitle = document.getElementById('intro-title');
+            introTitle.classList.remove('hidden');
+            setTimeout(() => {
+                introTitle.style.opacity = '1';
+                introTitle.style.transform = 'translateY(0)';
+            }, 50);
+
+            const envelope = document.getElementById('envelope-box');
+            envelope.classList.remove('hidden');
+            setTimeout(() => {
+                envelope.style.transform = 'scale(1) translateY(0)';
+                envelope.style.opacity = '1';
+            }, 50);
+        }
+
+        function triggerBurstFireworks() {
+            // Confetti burst from multiple angles
+            var count = 200;
+            var defaults = {
+                origin: { y: 0.7 }
+            };
+
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, {
+                    particleCount: Math.floor(count * particleRatio),
+                    colors: ['#f43f5e', '#fb7185', '#fda4af', '#ffe4e6', '#e11d48']
+                }));
+            }
+
+            fire(0.25, {
+                spread: 26,
+                startVelocity: 55,
+            });
+            fire(0.2, {
+                spread: 60,
+            });
+            fire(0.35, {
+                spread: 100,
+                decay: 0.91,
+                scalar: 0.8
+            });
+            fire(0.1, {
+                spread: 120,
+                startVelocity: 25,
+                decay: 0.92,
+                scalar: 1.2
+            });
+            fire(0.1, {
+                spread: 120,
+                startVelocity: 45,
+            });
+        }
+
+        // --- 3. Love Counter Interaction ---
+        let loveCount = 0;
+        function sendLove() {
+            loveCount++;
+            document.getElementById('love-count').innerText = loveCount;
+            
+            // Mini burst of hearts/confetti around button
+            confetti({
+                particleCount: 30,
+                spread: 50,
+                origin: { y: 0.8 },
+                colors: ['#f43f5e', '#fb7185', '#e11d48']
+            });
+        }
+
+        // --- 4. Background Audio using Tone.js (Cute Arpeggio Melody) ---
+        let synth;
+        let loop;
+        let isMusicPlaying = false;
+
+        function initAudio() {
+            if (synth) return;
+            // Create a cute, soft synth setup
+            synth = new Tone.Synth({
+                oscillator: { type: "sine" },
+                envelope: {
+                    attack: 0.05,
+                    decay: 0.2,
+                    sustain: 0.2,
+                    release: 1.5
+                }
+            }).toDestination();
+            synth.volume.value = -12;
+
+            // Cute notes for a romantic 20/10 box melody (C major pentatonic / romantic vibes)
+            const notes = ["C5", "E5", "G5", "B5", "C6", "B5", "G5", "E5"];
+            let index = 0;
+
+            loop = new Tone.Loop(time => {
+                synth.triggerAttackRelease(notes[index], "8n", time);
+                index = (index + 1) % notes.length;
+            }, "4n");
+        }
+
+        async function toggleMusic() {
+            await Tone.start();
+            initAudio();
+
+            const soundIcon = document.getElementById('sound-icon');
+            const soundText = document.getElementById('sound-text');
+
+            if (isMusicPlaying) {
+                Tone.Transport.stop();
+                loop.stop();
+                isMusicPlaying = false;
+                soundIcon.className = "fa-solid fa-volume-xmark";
+                soundText.innerText = "Bật Nhạc Nền";
+            } else {
+                Tone.Transport.start();
+                loop.start(0);
+                isMusicPlaying = true;
+                soundIcon.className = "fa-solid fa-volume-high text-rose-600 animate-pulse";
+                soundText.innerText = "Tắt Nhạc Nền";
+            }
+        }
+
+        async function startAudioOnAction() {
+            if (!isMusicPlaying) {
+                try {
+                    await Tone.start();
+                    initAudio();
+                    Tone.Transport.start();
+                    loop.start(0);
+                    isMusicPlaying = true;
+                    document.getElementById('sound-icon').className = "fa-solid fa-volume-high text-rose-600 animate-pulse";
+                    document.getElementById('sound-text').innerText = "Tắt Nhạc Nền";
+                } catch(e) {
+                    console.log("Audio autoplay prevented by browser policy, user can click toggle.");
+                }
+            }
+        }
+    </script>
+</body>
+</html>
